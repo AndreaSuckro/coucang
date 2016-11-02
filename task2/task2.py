@@ -22,7 +22,7 @@ eta = lambda c,t: c/t
 # apply network
 x = 2
 w = np.array([1., 1.])
-c = 0.3
+c = 0.1
 
 # Task 4 - Training Data
 sampleSize = 30
@@ -35,15 +35,41 @@ dogs = np.vstack([dogs, -1 * np.ones(dogs.shape)])
 
 catdog = np.hstack([cats, dogs])
 
+# training
 for t, (sample, target) in enumerate(catdog.T, 1):
     y = net(sample, w)
-    w[1] = w[1] - eta(c,t) * (y - target) * actFunDeriv(actFun(w[1] * actFun(w[0] * sample)))
-    w[0] = w[0] - eta(c,t) * actFunDeriv(actFun(w[0] * sample))
+    w[1] = w[1] - eta(c,t) * (y - target) * actFunDeriv(y) * actFun(sample * w[0])
+    w[0] = w[0] - eta(c,t) * (y - target) * actFunDeriv(actFun(w[0] * sample)) * sample
 
+print("Weights after backprop w0 {} and w1 {}".format(w[0], w[1]))
+
+# testing
+for t, (sample, target) in enumerate(catdog.T, 1):
+    y = net(sample, w)
+
+
+###########
+# Finding the error plane
+
+def test_weight(w):
+    error = 0
+    for t, (sample, target) in enumerate(catdog.T, 1):
+        error += net_error(net(sample, w), target)
+    return error / len(catdog.T)
+
+# brute force calculating all combinations
+error_results = [(x, y, test_weight(np.array((x, y)))) for x in np.arange(-1, 1, 0.01) for y in np.arange(-1, 1, 0.01)]
 
 # Task 5 - Error function
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-cp = ax.plot_surface(x, y, z, cmap= plt.cm.coolwarm)
-plt.colorbar(cp)
+unpack = lambda x, y, z : (x, y, z)
+x, y, z = unpack(*zip(*error_results))
+ax.scatter(x,y,zs=z);
+ax.set_xlabel('w0')
+ax.set_ylabel('w1')
+ax.set_zlabel('error')
 plt.show()
+exit()
+
+
