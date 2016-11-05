@@ -38,26 +38,6 @@ catdog = np.hstack([cats, dogs])
 # normalize the data
 catdog[0,:] = norm(catdog[0,:])
 
-
-###################################################################
-# Neural Network with Backprop
-###################################################################
-w = np.array([1., 1.])
-c = 0.3
-
-# training
-for t, (sample, target) in enumerate(catdog.T, 1):
-     y = net(sample, w)
-     w[1] = w[1] - eta(c,t) * (y - target) * actFunDeriv(y) * actFun(sample * w[0])
-     w[0] = w[0] - eta(c,t) * (y - target) * actFunDeriv(actFun(w[0] * sample)) * sample
-
-print("Weights after backprop w0 {} and w1 {}".format(w[0], w[1]))
-
-# testing todo: implement rest
-# for t, (sample, target) in enumerate(catdog.T, 1):
-#     y = net(sample, w)
-
-
 ###################################################################
 # Finding the error plane
 ###################################################################
@@ -87,5 +67,26 @@ ax.set_xlabel('w0')
 ax.set_ylabel('w1')
 ax.set_zlabel('error')
 plt.show()
+
+###################################################################
+# Neural Network with Backprop
+###################################################################
+w = np.array([1., 1.])
+c = 0.3
+
+# training
+for t, (sample, target) in enumerate(catdog.T, 1):
+     y = net(sample, w)
+     w[1] = w[1] - eta(c,t) * (y - target) * actFunDeriv(y) * actFun(sample * w[0])
+     w[0] = w[0] - eta(c,t) * (y - target) * actFunDeriv(actFun(w[0] * sample)) * sample
+
+print("Weights after backprop w0 {} and w1 {}".format(w[0], w[1]))
+
+# testing todo: implement rest
+# for t, (sample, target) in enumerate(catdog.T, 1):
+#     y = net(sample, w)
+
+
+
 
 
