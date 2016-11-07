@@ -3,11 +3,11 @@ import numpy as np
 
 
 class MNIST():
-    def __init__(self, directory = './data'):
-        self.testData = self._load(directory + "t10k-images.idx3-ubyte")
-        self.testLabels = self._load(directory + "t10k-labels.idx1-ubyte", True)
-        self.trainingData = self._load(directory + "train-images.idx3-ubyte")
-        self.trainingLabels = self._load(directory + "train-labels.idx1-ubyte", True)
+    def __init__(self, directory = './data/'):
+        self.testData = self._load(directory + "t10k-images-idx3-ubyte")
+        self.testLabels = self._load(directory + "t10k-labels-idx1-ubyte", True)
+        self.trainingData = self._load(directory + "train-images-idx3-ubyte")
+        self.trainingLabels = self._load(directory + "train-labels-idx1-ubyte", True)
 
     def _load(self, path, labels = False):
 

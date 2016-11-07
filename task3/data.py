@@ -1,8 +1,6 @@
 from urllib import request
 from os import path, mkdir
-from shutil import unpack_archive
 import gzip
-import glob
 
 URLS = [
     'http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz',
