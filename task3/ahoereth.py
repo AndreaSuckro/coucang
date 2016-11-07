@@ -12,12 +12,6 @@ EPOCHS = 10000
 data = MNIST()
 
 
-def toLabelVec(labels, n=10):
-    r = np.zeros((len(labels), n))
-    r[range(len(labels)), labels] = 1
-    return r
-
-
 ###############################################################################
 # Visualize Data
 plt.ioff()
@@ -33,19 +27,19 @@ plt.show()
 ###############################################################################
 # Model
 x = tf.placeholder(tf.float32, (None, 784), name='input')
-t = tf.placeholder(tf.float32, (None, 10), name='target')
+t = tf.placeholder(tf.int64, (None), name='target')
 
 W = tf.Variable(tf.random_normal((784, 10)), name='weights')
 b = tf.Variable(tf.zeros((10,)), name='biases')
-y = tf.nn.softmax(tf.matmul(x, W) + b, name='predictions')
+y = tf.matmul(x, W) + b
 
-cross_entropy = -tf.reduce_sum(t*tf.log(y))
-train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
+entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(y, t, name='entropy')
+train_step = tf.train.GradientDescentOptimizer(0.01).minimize(entropy)
 
 
 ###############################################################################
 # Training & Predictions
-correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(t, 1))
+correct_prediction = tf.equal(tf.argmax(y, 1), t)
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 sess = tf.Session()
@@ -55,10 +49,10 @@ for i in range(EPOCHS):
     sample = random_integers(0, len(data.trainingData)-1, BATCHSIZE)
     sess.run(train_step, {
         x: data.trainingData[sample].reshape(-1, 28*28),
-        t: toLabelVec(data.trainingLabels[sample]),
+        t: data.trainingLabels[sample],
     })
 
 print(sess.run(accuracy, {
     x: data.testData.reshape(-1, 28*28),
-    t: toLabelVec(data.testLabels),
+    t: data.testLabels,
 }))
