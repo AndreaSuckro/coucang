@@ -26,12 +26,12 @@ plt.show()
 
 ###############################################################################
 # Model
-x = tf.placeholder(tf.float32, (None, 784), name='input')
+x = tf.placeholder(tf.float32, (None, 28, 28), name='input')
 t = tf.placeholder(tf.int64, (None), name='target')
 
 W = tf.Variable(tf.random_normal((784, 10)), name='weights')
 b = tf.Variable(tf.zeros((10,)), name='biases')
-y = tf.matmul(x, W) + b
+y = tf.matmul(tf.reshape(x, (-1, 28*28)), W) + b
 
 entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(y, t, name='entropy')
 train_step = tf.train.GradientDescentOptimizer(0.01).minimize(entropy)
@@ -54,15 +54,12 @@ acc = []
 for i in range(EPOCHS):
     sample = random_integers(0, len(data.trainingData)-1, BATCHSIZE)
     sess.run(train_step, {
-        x: data.trainingData[sample].reshape(-1, 28*28),
+        x: data.trainingData[sample],
         t: data.trainingLabels[sample],
     })
 
     if (i % TESTSTEPSIZE == 0):
-        acc.append(sess.run(accuracy, {
-            x: data.testData.reshape(-1, 28*28),
-            t: data.testLabels,
-        }))
+        acc.append(sess.run(accuracy, {x: data.testData, t: data.testLabels}))
         plt.plot(range(0, i+1, TESTSTEPSIZE), acc, 'r-')
         plt.ylabel('Accuracy {:1.3f}'.format(acc[-1]))
         plt.xlabel('Epoch {:d}'.format(i))
