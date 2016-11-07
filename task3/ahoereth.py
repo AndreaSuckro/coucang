@@ -18,8 +18,8 @@ def toLabelVec(labels, n=10):
     return r
 
 
-#################################################
-# Data
+###############################################################################
+# Visualize Data
 plt.ioff()
 fig = plt.figure('MNIST Data')
 for i, sample in enumerate(choice(len(data.trainingData), 9, replace=False)):
@@ -30,10 +30,10 @@ for i, sample in enumerate(choice(len(data.trainingData), 9, replace=False)):
 plt.show()
 
 
-#################################################
+###############################################################################
 # Model
-x = tf.placeholder(tf.float32, shape=(None, 784), name='input')
-t = tf.placeholder(tf.float32, shape=(None, 10), name='target')
+x = tf.placeholder(tf.float32, (None, 784), name='input')
+t = tf.placeholder(tf.float32, (None, 10), name='target')
 
 W = tf.Variable(tf.random_normal((784, 10)), name='weights')
 b = tf.Variable(tf.zeros((10,)), name='biases')
@@ -43,22 +43,22 @@ cross_entropy = -tf.reduce_sum(t*tf.log(y))
 train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
 
 
-#################################################
+###############################################################################
 # Training & Predictions
 correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(t, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-with tf.Session() as sess:
-    sess.run(tf.initialize_all_variables())
-    for i in range(EPOCHS):
-        sample = random_integers(0, len(data.trainingData)-1, BATCHSIZE)
-        sess.run(train_step, {
-            x: data.trainingData[sample].reshape(-1, 28*28),
-            t: toLabelVec(data.trainingLabels[sample]),
-        })
+sess = tf.Session()
+sess.run(tf.initialize_all_variables())
 
-    # Check the results.
-    print(sess.run(accuracy, {
-        x: data.testData.reshape(-1, 28*28),
-        t: toLabelVec(data.testLabels),
-    }))
+for i in range(EPOCHS):
+    sample = random_integers(0, len(data.trainingData)-1, BATCHSIZE)
+    sess.run(train_step, {
+        x: data.trainingData[sample].reshape(-1, 28*28),
+        t: toLabelVec(data.trainingLabels[sample]),
+    })
+
+print(sess.run(accuracy, {
+    x: data.testData.reshape(-1, 28*28),
+    t: toLabelVec(data.testLabels),
+}))
