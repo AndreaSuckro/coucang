@@ -57,7 +57,7 @@ minimizer = optimizer.minimize(cross_entropy)
 rand_idx = np.random.random_integers(0, len(trainingData)-1, size=[batch_size,max_epochs])
 
 # test
-correct_prediction = tf.equal(tf.argmax(input, 1), tf.argmax(desired, 1))
+correct_prediction = tf.equal(tf.argmax(neuron_out, 1), tf.argmax(desired, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 ################################################
