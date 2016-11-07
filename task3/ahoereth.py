@@ -45,6 +45,12 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 sess = tf.Session()
 sess.run(tf.initialize_all_variables())
 
+
+plt.ion()
+plt.axis([0, EPOCHS, 0, 1])
+plt.title('Training...')
+acc = []
+
 for i in range(EPOCHS):
     sample = random_integers(0, len(data.trainingData)-1, BATCHSIZE)
     sess.run(train_step, {
@@ -52,7 +58,16 @@ for i in range(EPOCHS):
         t: data.trainingLabels[sample],
     })
 
-print(sess.run(accuracy, {
-    x: data.testData.reshape(-1, 28*28),
-    t: data.testLabels,
-}))
+    if (i % TESTSTEPSIZE == 0):
+        acc.append(sess.run(accuracy, {
+            x: data.testData.reshape(-1, 28*28),
+            t: data.testLabels,
+        }))
+        plt.plot(range(0, i+1, TESTSTEPSIZE), acc, 'r-')
+        plt.ylabel('Accuracy {:1.3f}'.format(acc[-1]))
+        plt.xlabel('Epoch {:d}'.format(i))
+        plt.pause(0.001)
+
+plt.ioff()
+plt.title('Training done.')
+plt.show()
