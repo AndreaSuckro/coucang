@@ -91,3 +91,7 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+
+##### Actual ignores:
+/task3/data
