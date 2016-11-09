@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from matplotlib import pyplot as plt
 import numpy as np
 from numpy.random import choice, random_integers
