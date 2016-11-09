@@ -7,6 +7,7 @@ import tensorflow as tf
 
 BATCHSIZE = 100
 EPOCHS = 10000
+TESTSTEPSIZE = 100
 
 
 data = MNIST()
@@ -36,15 +37,13 @@ y = tf.matmul(tf.reshape(x, (-1, 28*28)), W) + b
 entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(y, t, name='entropy')
 train_step = tf.train.GradientDescentOptimizer(0.01).minimize(entropy)
 
-
-###############################################################################
-# Training & Predictions
 correct_prediction = tf.equal(tf.argmax(y, 1), t)
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+###############################################################################
+# Training
 sess = tf.Session()
 sess.run(tf.initialize_all_variables())
-
 
 plt.ion()
 plt.axis([0, EPOCHS, 0, 1])
@@ -52,11 +51,8 @@ plt.title('Training...')
 acc = []
 
 for i in range(EPOCHS):
-    sample = random_integers(0, len(data.trainingData)-1, BATCHSIZE)
-    sess.run(train_step, {
-        x: data.trainingData[sample],
-        t: data.trainingLabels[sample],
-    })
+    batch_x, batch_t = data.getTrainingBatch(BATCHSIZE)
+    sess.run(train_step, {x: batch_x, t: batch_t})
 
     if (i % TESTSTEPSIZE == 0):
         acc.append(sess.run(accuracy, {x: data.testData, t: data.testLabels}))
