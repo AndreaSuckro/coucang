@@ -10,6 +10,7 @@ import tensorflow as tf
 BATCHSIZE = 100
 EPOCHS = 10000
 TESTSTEPSIZE = 100
+EPS = 7./3 - 4./3 - 1
 
 
 data = MNIST()
@@ -31,16 +32,17 @@ plt.show()
 ###############################################################################
 # Model
 x = tf.placeholder(tf.float32, (None, 28, 28), name='input')
-t = tf.placeholder(tf.int64, (None), name='target')
+t = tf.placeholder(tf.int32, (None), name='target')
+tvec = tf.cast(tf.one_hot(t, 10, 1, 0), tf.float32)
 
 W = tf.Variable(tf.random_normal((784, 10)), name='weights')
 b = tf.Variable(tf.zeros((10,)), name='biases')
-y = tf.matmul(tf.reshape(x, (-1, 28*28)), W) + b
+y = tf.nn.softmax(tf.matmul(tf.reshape(x, (-1, 28*28)), W) + b, name='output')
 
-entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(y, t, name='entropy')
-train_step = tf.train.GradientDescentOptimizer(0.01).minimize(entropy)
+entropy = -tf.reduce_sum(tvec*tf.log(y+EPS))
+train_step = tf.train.GradientDescentOptimizer(0.001).minimize(entropy)
 
-correct_prediction = tf.equal(tf.argmax(y, 1), t)
+correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(tvec, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 ###############################################################################
