@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# %matploltib notebook
 from matplotlib import pyplot as plt
 import numpy as np
 from numpy.random import choice, random_integers
@@ -23,6 +24,7 @@ for i, sample in enumerate(choice(len(data.trainingData), 9, replace=False)):
     sbplt.axis('off')
     sbplt.set_title(data.trainingLabels[sample])
     sbplt.imshow(data.trainingData[sample], cmap='gray')
+fig.canvas.draw()
 plt.show()
 
 
@@ -47,20 +49,23 @@ sess = tf.Session()
 sess.run(tf.initialize_all_variables())
 
 plt.ion()
-plt.axis([0, EPOCHS, 0, 1])
+figs, ax = plt.subplots(1, 1)
 plt.title('Training...')
 acc = []
 
-for i in range(EPOCHS):
+for i in range(1, EPOCHS+1):
     batch_x, batch_t = data.getTrainingBatch(BATCHSIZE)
     sess.run(train_step, {x: batch_x, t: batch_t})
 
-    if (i % TESTSTEPSIZE == 0):
+    if (i == 1 or i % TESTSTEPSIZE == 0):
+        plt.sca(ax)
+        ax.cla()
+        ax.axis([0, EPOCHS, 0, 1])
         acc.append(sess.run(accuracy, {x: data.testData, t: data.testLabels}))
         plt.plot(range(0, i+1, TESTSTEPSIZE), acc, 'r-')
         plt.ylabel('Accuracy {:1.3f}'.format(acc[-1]))
         plt.xlabel('Epoch {:d}'.format(i))
-        plt.pause(0.001)
+        figs.canvas.draw()
 
 plt.ioff()
 plt.title('Training done.')
