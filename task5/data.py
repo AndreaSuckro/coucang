@@ -17,9 +17,12 @@ class Data():
 
     def _split(self, split, data, labels):
         idx = permutation(np.arange(len(labels)))
-        boundaries = (len(idx) // split[0], len(idx) // split[1])
-        sets = np.split(idx, boundaries)
-        return ((data[i], labels[i]) for i in sets)
+        parts = ()
+        for s in split:
+            left = len(parts[-1][0]) if len(parts) else 0
+            right = left + len(idx) // 100 * s
+            parts += ((data[left:right], labels[left:right]),)
+        return parts
 
     def get_batch(self, n=100, src=False):
         src = src or self.train
