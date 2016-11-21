@@ -1,7 +1,7 @@
 from os import path
 import pickle
 import numpy as np
-from numpy.random import shuffle, random_integers
+from numpy.random import permutation, random_integers
 
 
 class Data():
@@ -16,16 +16,12 @@ class Data():
             return pickle.load(f)
 
     def _split(self, split, data, labels):
-        idx = np.arange(len(labels))
-        shuffle(idx)
-        split = (len(idx) // split[0], len(idx) // split[1])
-        idx = np.split(idx, split)
-        train = (data[idx[0]], labels[idx[0]])
-        validation = (data[idx[1]], labels[idx[1]])
-        test = (data[idx[2]], labels[idx[2]])
-        return train, validation, test
+        idx = permutation(np.arange(len(labels)))
+        boundaries = (len(idx) // split[0], len(idx) // split[1])
+        sets = np.split(idx, boundaries)
+        return ((data[i], labels[i]) for i in sets)
 
-    def getBatch(self, n=100, src=False):
+    def get_batch(self, n=100, src=False):
         src = src or self.train
         data, labels = src
         sample = random_integers(0, len(labels)-1, n)
