@@ -7,7 +7,7 @@ from numpy.random import permutation, random_integers
 class Data():
     def __init__(self, fdir='./data/', split=(70, 20, 10)):
         self.data = self._load(path.join(fdir, 'trainData.pickle'))
-        self.labels = self._load(path.join(fdir, 'trainLabels.pickle'))
+        self.labels = self._load(path.join(fdir, 'trainLabels.pickle')) % 10
         self.train, self.validation, self.test = \
             self._split(split, self.data, self.labels)
 
